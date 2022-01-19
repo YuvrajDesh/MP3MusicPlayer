@@ -4,19 +4,25 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
 import android.view.WindowManager
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 
 @SuppressLint("CustomSplashScreen")
 class SplashActivity : AppCompatActivity() {
       val permission_code = 1001
+       @RequiresApi(Build.VERSION_CODES.P)
        val permission = arrayOf(
            Manifest.permission.READ_EXTERNAL_STORAGE,
            Manifest.permission.MODIFY_AUDIO_SETTINGS,
+           Manifest.permission.RECORD_AUDIO,
+          Manifest.permission.FOREGROUND_SERVICE,
+           Manifest.permission.WRITE_EXTERNAL_STORAGE
 
        )
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -52,7 +58,9 @@ class SplashActivity : AppCompatActivity() {
                    if(grantResults.isNotEmpty() && grantResults[0]==PackageManager.PERMISSION_GRANTED
                        && grantResults[1]==PackageManager.PERMISSION_GRANTED
                        && grantResults[2]==PackageManager.PERMISSION_GRANTED
-                       && grantResults[3]==PackageManager.PERMISSION_GRANTED)
+                       && grantResults[3]==PackageManager.PERMISSION_GRANTED
+                       && grantResults[4]==PackageManager.PERMISSION_GRANTED
+                   )
 
 
                    {

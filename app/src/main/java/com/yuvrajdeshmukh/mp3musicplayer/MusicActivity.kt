@@ -6,7 +6,9 @@ import android.content.ServiceConnection
 import android.media.MediaPlayer
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
 import android.os.IBinder
+import android.os.Looper
 import android.widget.ImageButton
 import android.widget.SeekBar
 import android.widget.TextView
@@ -15,17 +17,27 @@ class MusicActivity : AppCompatActivity() ,ServiceConnection{
     companion object{
         const val NAME_EXTRA = "name_extra"
         const val DESC_EXTRA = "desc_extra"
+        var runnable : Runnable? = null
+
+        lateinit var myMusicList: ArrayList<Music>
         const val DURATION_EXTRA = "duration_extra"
         var songPosition : Int = 0
+        var musicService : MusicService? = null
+        var isPlaying : Boolean = false
+
+
 
     }
-
-    var isPlaying : Boolean = false
-    var shuffleButtonEnabled : Boolean = false
-    lateinit var myMusicList: ArrayList<Music>
-
+    var currentTime: TextView? = null
     var seekBar : SeekBar? = null
-    var musicService : MusicService? = null
+
+
+
+    var shuffleButtonEnabled : Boolean = false
+
+
+
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -38,29 +50,34 @@ class MusicActivity : AppCompatActivity() ,ServiceConnection{
         setUpLayout()
 
 
+        musicService?.displayNotification()
+
+
+
 
         seekBar = findViewById(R.id.seekBar)
-//       seekBar?.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener{
-//           override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-//               if(fromUser) musicService?.mediaPlayer?.seekTo(progress)
-//
-//           }
-//
-//           override fun onStartTrackingTouch(seekBar: SeekBar?) =Unit
-//
-//
-//
-//           override fun onStopTrackingTouch(seekBar: SeekBar?) =Unit
-//
-//
-//
-//       })
+       seekBar?.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener{
+           override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+               if(fromUser) musicService?.mediaPlayer?.seekTo(progress)
+
+           }
+
+           override fun onStartTrackingTouch(seekBar: SeekBar?) =Unit
+
+
+
+           override fun onStopTrackingTouch(seekBar: SeekBar?) =Unit
+
+
+
+       })
 
 
 
 
 
     }
+
     fun setUpLayout()
     {
 //        val name = intent.getStringExtra(NAME_EXTRA)
@@ -73,7 +90,7 @@ class MusicActivity : AppCompatActivity() ,ServiceConnection{
             "dashboardadapter" ->
             {
                 myMusicList = ArrayList()
-                myMusicList.addAll(DashboardFragment.musicListMA!!)
+                myMusicList?.addAll(DashboardFragment.musicListMA!!)
                 myLayout()
 
 
@@ -81,6 +98,14 @@ class MusicActivity : AppCompatActivity() ,ServiceConnection{
 
 
 
+
+            }
+            "NowPlayingFragment" ->
+            {
+
+                myMusicList = ArrayList()
+                myMusicList?.addAll(DashboardFragment.musicListMA!!)
+                myLayout()
 
             }
         }
@@ -97,7 +122,7 @@ class MusicActivity : AppCompatActivity() ,ServiceConnection{
         var title = findViewById<TextView>(R.id.songTitle) as TextView
         var artist = findViewById<TextView>(R.id.songArtist) as TextView
         var dur = findViewById<TextView>(R.id.endTime) as TextView
-        var currentTime = findViewById<TextView>(R.id.startTime) as TextView
+
 //        binding.songNamePA.text = musicListPA[songPosition].title
         title.text = myMusicList[songPosition].songName
         artist.text = myMusicList[songPosition].songSonger
@@ -108,6 +133,8 @@ class MusicActivity : AppCompatActivity() ,ServiceConnection{
     }
     fun mediaPlaying()
     {
+        currentTime = findViewById(R.id.startTime)
+
         if(musicService?.mediaPlayer==null)           musicService?.mediaPlayer= MediaPlayer()
         musicService?.mediaPlayer?.reset()
         musicService?.mediaPlayer?.setDataSource(myMusicList[songPosition].path)
@@ -117,9 +144,14 @@ class MusicActivity : AppCompatActivity() ,ServiceConnection{
         musicService?.mediaPlayer?.prepare()
         musicService?.mediaPlayer?.start()
         isPlaying = true
+        currentTime?.text = myMusicList[songPosition].formatDuration(musicService?.mediaPlayer?.currentPosition!!.toLong())
+        seekBar?.progress = 0
+        seekBar?.max = musicService!!.mediaPlayer!!.duration
+
 
 
     }
+
 
     fun pauseFunction(view: android.view.View) {
         var buttonPlayPause : ImageButton = findViewById(R.id.buttonPlayPause)
@@ -204,6 +236,9 @@ class MusicActivity : AppCompatActivity() ,ServiceConnection{
         musicService = binder.currentService()
 
         mediaPlaying()
+        musicService!!.displayNotification()
+        seekBarRunnerTime()
+
 
 
     }
@@ -225,6 +260,24 @@ class MusicActivity : AppCompatActivity() ,ServiceConnection{
 
 
     }
+    fun seekBarRunnerTime()
+    {
+        seekBar = findViewById(R.id.seekBar)
+
+
+
+
+        runnable = Runnable {
+            currentTime?.text = myMusicList[MusicActivity.songPosition].formatDuration(musicService?.mediaPlayer?.currentPosition!!.toLong())
+            seekBar?.progress = musicService!!.mediaPlayer!!.currentPosition
+            Handler(Looper.getMainLooper()).postDelayed(runnable!!,200)
+
+
+        }
+        Handler(Looper.getMainLooper()).postDelayed(runnable!!,0)
+
+    }
+
 
     override fun onServiceDisconnected(name: ComponentName?) {
         musicService = null
