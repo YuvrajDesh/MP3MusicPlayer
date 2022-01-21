@@ -12,6 +12,7 @@ import android.os.Looper
 import android.widget.ImageButton
 import android.widget.SeekBar
 import android.widget.TextView
+import android.widget.Toast
 
 class MusicActivity : AppCompatActivity() ,ServiceConnection{
     companion object{
@@ -19,15 +20,21 @@ class MusicActivity : AppCompatActivity() ,ServiceConnection{
         const val DESC_EXTRA = "desc_extra"
         var runnable : Runnable? = null
 
+
         lateinit var myMusicList: ArrayList<Music>
         const val DURATION_EXTRA = "duration_extra"
         var songPosition : Int = 0
         var musicService : MusicService? = null
         var isPlaying : Boolean = false
+        var isFavourite = false
+        var fsongIndex : Int = -1
+        var favBtn : ImageButton? = null
 
 
 
     }
+
+
     var currentTime: TextView? = null
     var seekBar : SeekBar? = null
 
@@ -44,6 +51,8 @@ class MusicActivity : AppCompatActivity() ,ServiceConnection{
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_music)
         //For starting service
+        myMusicList = ArrayList()
+        favBtn = findViewById(R.id.buttonFav) as ImageButton
         val intent = Intent(this,MusicService::class.java)
         bindService(intent,this, BIND_AUTO_CREATE)
         startService(intent)
@@ -87,6 +96,12 @@ class MusicActivity : AppCompatActivity() ,ServiceConnection{
 
         when(intent.getStringExtra("class"))
         {
+            "favouriteadapter" ->
+            {
+                myMusicList = ArrayList()
+                myMusicList.addAll(FavoritesFragment.FmusicListMA)
+                myLayout()
+            }
             "dashboardadapter" ->
             {
                 myMusicList = ArrayList()
@@ -113,9 +128,11 @@ class MusicActivity : AppCompatActivity() ,ServiceConnection{
     }
     fun myLayout()
     {
+
         songPosition = intent.getIntExtra("index",0)
 
         val dn = intent.getLongExtra(DURATION_EXTRA,0)
+        fsongIndex = myMusicList[songPosition].favoriteSongChecker(myMusicList[songPosition].id.toString())
 //
 
 
@@ -161,6 +178,9 @@ class MusicActivity : AppCompatActivity() ,ServiceConnection{
             buttonPlayPause.setBackgroundResource(R.drawable.play_icon)
             musicService?.mediaPlayer!!.pause()
             isPlaying = false
+            NowPlayingFragment.PlayPauseBtnNp?.setBackgroundResource(R.drawable.play_icon)
+
+
 
 
         }
@@ -169,6 +189,8 @@ class MusicActivity : AppCompatActivity() ,ServiceConnection{
             buttonPlayPause.setBackgroundResource(R.drawable.pause_icon)
             musicService?.mediaPlayer!!.start()
             isPlaying = true
+            NowPlayingFragment.PlayPauseBtnNp?.setBackgroundResource(R.drawable.pause_icon)
+
         }
 
 
@@ -281,6 +303,36 @@ class MusicActivity : AppCompatActivity() ,ServiceConnection{
 
     override fun onServiceDisconnected(name: ComponentName?) {
         musicService = null
+    }
+
+    fun isFavouriteOrNot(view: android.view.View) {
+//        FavoritesFragment.FmusicListMA = ArrayList()
+        fsongIndex = myMusicList[songPosition].favoriteSongChecker(myMusicList[songPosition].id.toString())
+        favBtn = findViewById(R.id.buttonFav) as ImageButton
+        if (isFavourite)
+        {
+
+            favBtn?.setImageResource(R.drawable.favorite_off)
+            FavoritesFragment.FmusicListMA?.removeAt(fsongIndex)
+            isFavourite = false
+
+
+
+
+
+        }
+        else
+        {
+
+            favBtn?.setImageResource(R.drawable.favorite_on)
+            FavoritesFragment.FmusicListMA.add(myMusicList[songPosition])
+            isFavourite = true
+
+
+//            FavoritesFragment.FmusicListMA?.remove(fsongIndex)
+
+        }
+        Toast.makeText(this,"click on fav",Toast.LENGTH_SHORT).show()
     }
 
 

@@ -8,11 +8,12 @@
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.25" />
         <entry key="app/src/main/res/layout/activity_music.xml" value="0.25" />
         <entry key="app/src/main/res/layout/activity_splash.xml" value="0.12681159420289856" />
-        <entry key="app/src/main/res/layout/fragment_about.xml" value="0.12083333333333333" />
+        <entry key="app/src/main/res/layout/fav_row_layout.xml" value="0.17395833333333333" />
+        <entry key="app/src/main/res/layout/fragment_about.xml" value="0.25" />
         <entry key="app/src/main/res/layout/fragment_dashboard.xml" value="0.25" />
-        <entry key="app/src/main/res/layout/fragment_favorites.xml" value="0.12083333333333333" />
+        <entry key="app/src/main/res/layout/fragment_favorites.xml" value="0.335" />
         <entry key="app/src/main/res/layout/fragment_now_playing.xml" value="0.2028985507246377" />
-        <entry key="app/src/main/res/layout/fragment_settings.xml" value="0.12083333333333333" />
+        <entry key="app/src/main/res/layout/fragment_settings.xml" value="0.25" />
         <entry key="app/src/main/res/layout/row_layout.xml" value="0.25" />
         <entry key="app/src/main/res/menu/bottom_nav.xml" value="0.165" />
       </map>

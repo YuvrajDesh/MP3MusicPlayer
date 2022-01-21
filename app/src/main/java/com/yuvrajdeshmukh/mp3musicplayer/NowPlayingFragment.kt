@@ -18,10 +18,16 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 
 class NowPlayingFragment : Fragment() {
-    var PlayPauseBtnNp: ImageButton? = null
+    companion object{
+        var PlayPauseBtnNp: ImageButton? = null
+
+
+    }
     var SongNameNp: TextView? = null
     var NextBtnNp : ImageButton? = null
     var nowPlayingF : RelativeLayout? = null
+
+
 
 
 
@@ -32,11 +38,14 @@ class NowPlayingFragment : Fragment() {
     ): View? {
         PlayPauseBtnNp = view?.findViewById(R.id.playPauseBtnNP)
         SongNameNp = view?.findViewById(R.id.songNameNP)
+        NextBtnNp = view?.findViewById(R.id.nextBtnNP)
+        nowPlayingF = view?.findViewById(R.id.nowPlayingF)
 
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_now_playing, container, false)
         view.visibility = View.INVISIBLE
-        MusicActivity.isPlaying = false
+
+
 
 
 
@@ -50,6 +59,7 @@ class NowPlayingFragment : Fragment() {
         PlayPauseBtnNp = view?.findViewById(R.id.playPauseBtnNP)
         NextBtnNp = view?.findViewById(R.id.nextBtnNP)
         nowPlayingF = view?.findViewById(R.id.nowPlayingF)
+
 
         super.onResume()
         if (MusicActivity.musicService != null) {
@@ -95,14 +105,12 @@ class NowPlayingFragment : Fragment() {
                 }
 
             }
-
-
             PlayPauseBtnNp?.setOnClickListener {
 
 
                 if(MusicActivity.isPlaying)
                 {
-                   PlayPauseBtnNp?.setBackgroundResource(R.drawable.play_icon)
+                    PlayPauseBtnNp?.setBackgroundResource(R.drawable.play_icon)
                     MusicActivity.musicService?.mediaPlayer!!.pause()
                     MusicActivity.isPlaying = false
 
@@ -116,6 +124,9 @@ class NowPlayingFragment : Fragment() {
                 }
 
             }
+
+
+
             nowPlayingF?.setOnClickListener {
                 val intent = Intent(requireContext(),MusicActivity::class.java)
                 intent.putExtra("index",MusicActivity.songPosition)

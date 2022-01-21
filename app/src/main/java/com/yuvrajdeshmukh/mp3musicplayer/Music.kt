@@ -21,6 +21,7 @@ class Music {
   this.duration = duration
   this.path = path
   formatDuration(duration)
+  favoriteSongChecker(id)
 
 
 
@@ -34,5 +35,17 @@ class Music {
 
 
   return String.format("%2d:%2d",minutes,seconds)
+ }
+ fun favoriteSongChecker(id:String) : Int {
+  MusicActivity.isFavourite = false
+  FavoritesFragment.FmusicListMA?.forEachIndexed { index, music ->
+   if (id == music.id) {
+    MusicActivity.isFavourite = true
+    return index
+   }
+  }
+  return -1
+
+
  }
 }
