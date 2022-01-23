@@ -14,6 +14,7 @@ import android.widget.RelativeLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
+import com.cleveroad.audiovisualization.AudioVisualization
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 
@@ -32,6 +33,7 @@ class NowPlayingFragment : Fragment() {
 
 
 
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -41,9 +43,13 @@ class NowPlayingFragment : Fragment() {
         NextBtnNp = view?.findViewById(R.id.nextBtnNP)
         nowPlayingF = view?.findViewById(R.id.nowPlayingF)
 
+
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_now_playing, container, false)
         view.visibility = View.INVISIBLE
+
+
+
 
 
 
@@ -65,6 +71,29 @@ class NowPlayingFragment : Fragment() {
         if (MusicActivity.musicService != null) {
             view!!.visibility = View.VISIBLE
             SongNameNp!!.text = MusicActivity.myMusicList[MusicActivity.songPosition].songName
+
+
+            if(MusicActivity.isPlaying)
+            {
+
+
+                PlayPauseBtnNp?.setBackgroundResource(R.drawable.pause_icon)
+
+
+
+
+
+
+            }
+            else{
+                PlayPauseBtnNp?.setBackgroundResource(R.drawable.play_icon)
+
+
+
+
+
+            }
+
 
             NextBtnNp?.setOnClickListener {
                 if(MusicActivity.songPosition == MusicActivity.myMusicList.size - 1)

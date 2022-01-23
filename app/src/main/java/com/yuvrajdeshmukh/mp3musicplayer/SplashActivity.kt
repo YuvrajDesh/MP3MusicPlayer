@@ -12,6 +12,8 @@ import android.view.WindowManager
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
+import com.google.gson.GsonBuilder
+import com.google.gson.reflect.TypeToken
 
 @SuppressLint("CustomSplashScreen")
 class SplashActivity : AppCompatActivity() {
@@ -65,6 +67,17 @@ class SplashActivity : AppCompatActivity() {
 
                    {
                        gohome()
+                       FavoritesFragment.FmusicListMA = ArrayList()
+                       val editor = getSharedPreferences("Favorites", AppCompatActivity.MODE_PRIVATE)
+//                       val jsonStringm = GsonBuilder().create().toJson(FavoritesFragment.FmusicListMA)
+                       val jsonString=editor.getString("FavoriteSongs",null)
+                       val typeToken = object : TypeToken<ArrayList<Music>>(){}.type
+                       if(jsonString != null)
+                       {
+                           val data : ArrayList<Music> = GsonBuilder().create().fromJson(jsonString,typeToken)
+                           FavoritesFragment.FmusicListMA.addAll(data)
+                       }
+
                    }
                 else
                    {
@@ -103,5 +116,13 @@ class SplashActivity : AppCompatActivity() {
             startActivity(intent)
             finish()
         }, 2000)
+    }
+    override fun onDestroy() {
+        super.onDestroy()
+        val editor = getSharedPreferences("Favorites", AppCompatActivity.MODE_PRIVATE).edit()
+        val jsonString = GsonBuilder().create().toJson(FavoritesFragment.FmusicListMA)
+        editor.putString("FavoriteSongs",jsonString)
+        editor.apply()
+
     }
 }

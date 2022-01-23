@@ -14,8 +14,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.gson.GsonBuilder
 import java.util.jar.Manifest
 
 
@@ -101,4 +103,6 @@ companion object
         }
         return arrayList
     }
+
+
 }

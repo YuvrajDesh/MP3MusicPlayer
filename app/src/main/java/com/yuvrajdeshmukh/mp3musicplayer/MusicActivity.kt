@@ -13,12 +13,20 @@ import android.widget.ImageButton
 import android.widget.SeekBar
 import android.widget.TextView
 import android.widget.Toast
+import com.cleveroad.audiovisualization.AudioVisualization
+import com.cleveroad.audiovisualization.GLAudioVisualizationView
+import com.google.gson.GsonBuilder
+import com.google.gson.reflect.TypeToken
 
 class MusicActivity : AppCompatActivity() ,ServiceConnection{
     companion object{
         const val NAME_EXTRA = "name_extra"
         const val DESC_EXTRA = "desc_extra"
         var runnable : Runnable? = null
+        private lateinit var glAudioVisualizationView : GLAudioVisualizationView
+
+        lateinit var audioVisualization : AudioVisualization
+
 
 
         lateinit var myMusicList: ArrayList<Music>
@@ -26,9 +34,11 @@ class MusicActivity : AppCompatActivity() ,ServiceConnection{
         var songPosition : Int = 0
         var musicService : MusicService? = null
         var isPlaying : Boolean = false
+
         var isFavourite = false
         var fsongIndex : Int = -1
         var favBtn : ImageButton? = null
+
 
 
 
@@ -37,6 +47,7 @@ class MusicActivity : AppCompatActivity() ,ServiceConnection{
 
     var currentTime: TextView? = null
     var seekBar : SeekBar? = null
+
 
 
 
@@ -53,10 +64,34 @@ class MusicActivity : AppCompatActivity() ,ServiceConnection{
         //For starting service
         myMusicList = ArrayList()
         favBtn = findViewById(R.id.buttonFav) as ImageButton
+
+
         val intent = Intent(this,MusicService::class.java)
         bindService(intent,this, BIND_AUTO_CREATE)
         startService(intent)
         setUpLayout()
+
+        if (isFavourite)
+        {
+
+
+
+
+            favBtn?.setImageResource(R.drawable.favorite_on)
+
+
+
+        }
+        else
+        {
+            favBtn?.setImageResource(R.drawable.favorite_off)
+
+
+
+
+        }
+
+//
 
 
         musicService?.displayNotification()
@@ -86,6 +121,7 @@ class MusicActivity : AppCompatActivity() ,ServiceConnection{
 
 
     }
+
 
     fun setUpLayout()
     {
@@ -126,6 +162,7 @@ class MusicActivity : AppCompatActivity() ,ServiceConnection{
         }
 
     }
+
     fun myLayout()
     {
 
@@ -147,10 +184,17 @@ class MusicActivity : AppCompatActivity() ,ServiceConnection{
         dur.text = myMusicList[songPosition].formatDuration(myMusicList[songPosition].duration)
 
 
+
+
+
+
     }
     fun mediaPlaying()
     {
+
         currentTime = findViewById(R.id.startTime)
+        glAudioVisualizationView = findViewById(R.id.visualizer_view)
+        audioVisualization = glAudioVisualizationView as AudioVisualization
 
         if(musicService?.mediaPlayer==null)           musicService?.mediaPlayer= MediaPlayer()
         musicService?.mediaPlayer?.reset()
@@ -161,6 +205,9 @@ class MusicActivity : AppCompatActivity() ,ServiceConnection{
         musicService?.mediaPlayer?.prepare()
         musicService?.mediaPlayer?.start()
         isPlaying = true
+//        audioVisualization?.linkTo(musicService?.mediaPlayer)
+        audioVisualization?.linkTo(musicService?.mediaPlayer)
+
         currentTime?.text = myMusicList[songPosition].formatDuration(musicService?.mediaPlayer?.currentPosition!!.toLong())
         seekBar?.progress = 0
         seekBar?.max = musicService!!.mediaPlayer!!.duration
@@ -169,9 +216,18 @@ class MusicActivity : AppCompatActivity() ,ServiceConnection{
 
     }
 
+    override fun onDestroy() {
+        audioVisualization.release()
+        super.onDestroy()
+
+    }
+
+
 
     fun pauseFunction(view: android.view.View) {
         var buttonPlayPause : ImageButton = findViewById(R.id.buttonPlayPause)
+        glAudioVisualizationView = findViewById(R.id.visualizer_view)
+        audioVisualization = glAudioVisualizationView as AudioVisualization
 
         if(isPlaying)
         {
@@ -179,6 +235,7 @@ class MusicActivity : AppCompatActivity() ,ServiceConnection{
             musicService?.mediaPlayer!!.pause()
             isPlaying = false
             NowPlayingFragment.PlayPauseBtnNp?.setBackgroundResource(R.drawable.play_icon)
+            audioVisualization?.onPause()
 
 
 
@@ -190,6 +247,7 @@ class MusicActivity : AppCompatActivity() ,ServiceConnection{
             musicService?.mediaPlayer!!.start()
             isPlaying = true
             NowPlayingFragment.PlayPauseBtnNp?.setBackgroundResource(R.drawable.pause_icon)
+            audioVisualization?.onResume()
 
         }
 
@@ -299,22 +357,18 @@ class MusicActivity : AppCompatActivity() ,ServiceConnection{
         Handler(Looper.getMainLooper()).postDelayed(runnable!!,0)
 
     }
-
-
-    override fun onServiceDisconnected(name: ComponentName?) {
-        musicService = null
-    }
-
     fun isFavouriteOrNot(view: android.view.View) {
-//        FavoritesFragment.FmusicListMA = ArrayList()
-        fsongIndex = myMusicList[songPosition].favoriteSongChecker(myMusicList[songPosition].id.toString())
-        favBtn = findViewById(R.id.buttonFav) as ImageButton
+////        FavoritesFragment.FmusicListMA = ArrayList()
+
+    fsongIndex = myMusicList[songPosition].favoriteSongChecker(myMusicList[songPosition].id.toString())
+    favBtn = findViewById(R.id.buttonFav) as ImageButton
         if (isFavourite)
         {
 
             favBtn?.setImageResource(R.drawable.favorite_off)
             FavoritesFragment.FmusicListMA?.removeAt(fsongIndex)
             isFavourite = false
+            Toast.makeText(this,"Removed from favorite",Toast.LENGTH_SHORT).show()
 
 
 
@@ -327,13 +381,25 @@ class MusicActivity : AppCompatActivity() ,ServiceConnection{
             favBtn?.setImageResource(R.drawable.favorite_on)
             FavoritesFragment.FmusicListMA.add(myMusicList[songPosition])
             isFavourite = true
+            Toast.makeText(this,"Added to favorite",Toast.LENGTH_SHORT).show()
 
 
 //            FavoritesFragment.FmusicListMA?.remove(fsongIndex)
 
         }
-        Toast.makeText(this,"click on fav",Toast.LENGTH_SHORT).show()
+//
+//
+//
     }
+
+
+    override fun onServiceDisconnected(name: ComponentName?) {
+        musicService = null
+    }
+
+
+
+
 
 
 }
