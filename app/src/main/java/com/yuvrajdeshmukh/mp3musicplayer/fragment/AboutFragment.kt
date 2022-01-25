@@ -1,4 +1,4 @@
-package com.yuvrajdeshmukh.mp3musicplayer
+package com.yuvrajdeshmukh.mp3musicplayer.fragment
 
 import android.content.Intent
 import android.net.Uri
@@ -8,7 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import android.widget.LinearLayout
+import com.yuvrajdeshmukh.mp3musicplayer.R
 
 
 class AboutFragment : Fragment() {

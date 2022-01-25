@@ -1,4 +1,4 @@
-package com.yuvrajdeshmukh.mp3musicplayer
+package com.yuvrajdeshmukh.mp3musicplayer.fragment
 
 import android.content.Context
 import android.os.Bundle
@@ -8,6 +8,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.yuvrajdeshmukh.mp3musicplayer.adapter.FavoriteAdapter
+import com.yuvrajdeshmukh.mp3musicplayer.data.Music
+import com.yuvrajdeshmukh.mp3musicplayer.R
 
 
 class FavoritesFragment : Fragment() {
@@ -37,7 +40,7 @@ class FavoritesFragment : Fragment() {
 //         FmusicListMA.add(Music("","","",0,""))
 
         //creating our adapter
-        val adapter = FavoriteAdapter(activity as Context, FavoritesFragment.FmusicListMA!!)
+        val adapter = FavoriteAdapter(activity as Context, FmusicListMA!!)
 
 //        //now adding the adapter to recyclerview
         FrecyclearView?.adapter = adapter

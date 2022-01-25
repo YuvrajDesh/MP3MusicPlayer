@@ -1,7 +1,5 @@
-package com.yuvrajdeshmukh.mp3musicplayer
+package com.yuvrajdeshmukh.mp3musicplayer.fragment
 
-import android.app.Activity
-import android.content.Context
 import android.content.Intent
 import android.media.MediaPlayer
 import android.os.Bundle
@@ -11,11 +9,11 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.RelativeLayout
+import android.widget.SeekBar
 import android.widget.TextView
-import android.widget.Toast
 import androidx.core.content.ContextCompat
-import com.cleveroad.audiovisualization.AudioVisualization
-import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.yuvrajdeshmukh.mp3musicplayer.R
+import com.yuvrajdeshmukh.mp3musicplayer.activity.MusicActivity
 
 
 class NowPlayingFragment : Fragment() {
@@ -34,6 +32,7 @@ class NowPlayingFragment : Fragment() {
 
 
 
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -42,6 +41,7 @@ class NowPlayingFragment : Fragment() {
         SongNameNp = view?.findViewById(R.id.songNameNP)
         NextBtnNp = view?.findViewById(R.id.nextBtnNP)
         nowPlayingF = view?.findViewById(R.id.nowPlayingF)
+
 
 
         // Inflate the layout for this fragment
@@ -65,6 +65,7 @@ class NowPlayingFragment : Fragment() {
         PlayPauseBtnNp = view?.findViewById(R.id.playPauseBtnNP)
         NextBtnNp = view?.findViewById(R.id.nextBtnNP)
         nowPlayingF = view?.findViewById(R.id.nowPlayingF)
+
 
 
         super.onResume()
@@ -157,11 +158,11 @@ class NowPlayingFragment : Fragment() {
 
 
             nowPlayingF?.setOnClickListener {
-                val intent = Intent(requireContext(),MusicActivity::class.java)
-                intent.putExtra("index",MusicActivity.songPosition)
+                val intent = Intent(requireContext(), MusicActivity::class.java)
+                intent.putExtra("index", MusicActivity.songPosition)
                 intent.putExtra("class","NowPlayingFragment")
 
-                startActivity(intent)
+                ContextCompat.startActivity(requireContext(),intent,null)
 
 
             }

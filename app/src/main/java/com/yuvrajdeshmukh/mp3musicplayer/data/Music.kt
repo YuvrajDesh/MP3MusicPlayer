@@ -1,6 +1,7 @@
-package com.yuvrajdeshmukh.mp3musicplayer
+package com.yuvrajdeshmukh.mp3musicplayer.data
 
-import java.time.Duration
+import com.yuvrajdeshmukh.mp3musicplayer.activity.MusicActivity
+import com.yuvrajdeshmukh.mp3musicplayer.fragment.FavoritesFragment
 import java.util.concurrent.TimeUnit
 
 //class Music(val id :Long, var songName: String, var songSinger:String)

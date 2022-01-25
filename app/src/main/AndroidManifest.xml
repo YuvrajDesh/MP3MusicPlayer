@@ -13,7 +13,7 @@
 
 
     <application
-        android:name=".ApplicationClass"
+        android:name=".application.ApplicationClass"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -22,10 +22,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MP3MusicPlayer">
         <activity
-            android:name=".MusicActivity"
+            android:name=".activity.MusicActivity"
             android:exported="false" />
         <activity
-            android:name=".SplashActivity"
+            android:name=".activity.SplashActivity"
             android:exported="true"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar">
             <intent-filter>
@@ -35,13 +35,13 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".MainActivity"
+            android:name=".activity.MainActivity"
             android:exported="true">
             <intent-filter>
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <service android:name=".MusicService"/>
+        <service android:name=".service.MusicService"/>
     </application>
 
 </manifest>

@@ -1,4 +1,4 @@
-package com.yuvrajdeshmukh.mp3musicplayer
+package com.yuvrajdeshmukh.mp3musicplayer.activity
 
 import android.content.ComponentName
 import android.content.Intent
@@ -15,8 +15,12 @@ import android.widget.TextView
 import android.widget.Toast
 import com.cleveroad.audiovisualization.AudioVisualization
 import com.cleveroad.audiovisualization.GLAudioVisualizationView
-import com.google.gson.GsonBuilder
-import com.google.gson.reflect.TypeToken
+import com.yuvrajdeshmukh.mp3musicplayer.*
+import com.yuvrajdeshmukh.mp3musicplayer.data.Music
+import com.yuvrajdeshmukh.mp3musicplayer.fragment.DashboardFragment
+import com.yuvrajdeshmukh.mp3musicplayer.fragment.FavoritesFragment
+import com.yuvrajdeshmukh.mp3musicplayer.fragment.NowPlayingFragment
+import com.yuvrajdeshmukh.mp3musicplayer.service.MusicService
 
 class MusicActivity : AppCompatActivity() ,ServiceConnection{
     companion object{
@@ -38,6 +42,7 @@ class MusicActivity : AppCompatActivity() ,ServiceConnection{
         var isFavourite = false
         var fsongIndex : Int = -1
         var favBtn : ImageButton? = null
+        var nowPlayingId : String = ""
 
 
 
@@ -66,29 +71,16 @@ class MusicActivity : AppCompatActivity() ,ServiceConnection{
         favBtn = findViewById(R.id.buttonFav) as ImageButton
 
 
-        val intent = Intent(this,MusicService::class.java)
-        bindService(intent,this, BIND_AUTO_CREATE)
-        startService(intent)
+//        val intent = Intent(this, MusicService::class.java)
+//        bindService(intent,this, BIND_AUTO_CREATE)
+//        startService(intent)
         setUpLayout()
 
         if (isFavourite)
-        {
-
-
-
-
-            favBtn?.setImageResource(R.drawable.favorite_on)
-
-
-
+        { favBtn?.setImageResource(R.drawable.favorite_on)
         }
         else
-        {
-            favBtn?.setImageResource(R.drawable.favorite_off)
-
-
-
-
+        {favBtn?.setImageResource(R.drawable.favorite_off)
         }
 
 //
@@ -111,35 +103,29 @@ class MusicActivity : AppCompatActivity() ,ServiceConnection{
 
 
            override fun onStopTrackingTouch(seekBar: SeekBar?) =Unit
-
-
-
        })
-
-
-
-
-
     }
-
-
     fun setUpLayout()
     {
 //        val name = intent.getStringExtra(NAME_EXTRA)
 //        val desc = intent.getStringExtra(DESC_EXTRA)
-
-
-
         when(intent.getStringExtra("class"))
         {
             "favouriteadapter" ->
             {
-                myMusicList = ArrayList()
-                myMusicList.addAll(FavoritesFragment.FmusicListMA)
+                val intent = Intent(this, MusicService::class.java)
+                bindService(intent,this, BIND_AUTO_CREATE)
+                startService(intent)
+//                myMusicList = ArrayList()
+//                myMusicList.addAll(FavoritesFragment.FmusicListMA)
+
                 myLayout()
             }
             "dashboardadapter" ->
             {
+                val intent = Intent(this, MusicService::class.java)
+                bindService(intent,this, BIND_AUTO_CREATE)
+                startService(intent)
                 myMusicList = ArrayList()
                 myMusicList?.addAll(DashboardFragment.musicListMA!!)
                 myLayout()
@@ -153,10 +139,39 @@ class MusicActivity : AppCompatActivity() ,ServiceConnection{
             }
             "NowPlayingFragment" ->
             {
+//                val intent = Intent(this, MusicService::class.java)
+//                bindService(intent,this, BIND_AUTO_CREATE)
+//                startService(intent)
+                currentTime = findViewById(R.id.startTime)
+                seekBar = findViewById(R.id.seekBar)
 
+                glAudioVisualizationView = findViewById(R.id.visualizer_view)
+                audioVisualization = glAudioVisualizationView as AudioVisualization
+                audioVisualization?.linkTo(musicService?.mediaPlayer)
+                audioVisualization.onResume()
+                seekBar?.progress = musicService!!.mediaPlayer!!.currentPosition
                 myMusicList = ArrayList()
                 myMusicList?.addAll(DashboardFragment.musicListMA!!)
+                currentTime?.text = myMusicList[songPosition].formatDuration(musicService?.mediaPlayer?.currentPosition!!.toLong())
+
                 myLayout()
+               
+
+
+
+
+
+
+                if(isPlaying)
+                {
+                    NowPlayingFragment.PlayPauseBtnNp?.setBackgroundResource(R.drawable.pause_icon)
+
+                }
+                else
+                {
+                    NowPlayingFragment.PlayPauseBtnNp?.setBackgroundResource(R.drawable.play_icon)
+
+                }
 
             }
         }
@@ -170,9 +185,6 @@ class MusicActivity : AppCompatActivity() ,ServiceConnection{
 
         val dn = intent.getLongExtra(DURATION_EXTRA,0)
         fsongIndex = myMusicList[songPosition].favoriteSongChecker(myMusicList[songPosition].id.toString())
-//
-
-
         var title = findViewById<TextView>(R.id.songTitle) as TextView
         var artist = findViewById<TextView>(R.id.songArtist) as TextView
         var dur = findViewById<TextView>(R.id.endTime) as TextView
@@ -183,13 +195,8 @@ class MusicActivity : AppCompatActivity() ,ServiceConnection{
 //                dur.text =myMusicList[songPosition].formatDuration(dur)
         dur.text = myMusicList[songPosition].formatDuration(myMusicList[songPosition].duration)
 
-
-
-
-
-
     }
-    fun mediaPlaying()
+    private fun mediaPlaying()
     {
 
         currentTime = findViewById(R.id.startTime)
@@ -211,13 +218,21 @@ class MusicActivity : AppCompatActivity() ,ServiceConnection{
         currentTime?.text = myMusicList[songPosition].formatDuration(musicService?.mediaPlayer?.currentPosition!!.toLong())
         seekBar?.progress = 0
         seekBar?.max = musicService!!.mediaPlayer!!.duration
+        nowPlayingId = myMusicList[songPosition].id.toString()
 
 
 
     }
 
     override fun onDestroy() {
-        audioVisualization.release()
+        try{
+            audioVisualization.release()
+        }catch(e:Exception)
+        {
+
+
+        }
+
         super.onDestroy()
 
     }
@@ -255,15 +270,19 @@ class MusicActivity : AppCompatActivity() ,ServiceConnection{
     }
 
     fun previousSongPlay(view: android.view.View) {
-        if (songPosition==0)
+        if (songPosition ==0)
         {
+            audioVisualization.release()
             songPosition = myMusicList.size - 1
+
             setLayout()
             mediaPlaying()
 
         }
         else{
+            audioVisualization.release()
             songPosition--
+
             setLayout()
             mediaPlaying()
 
@@ -271,16 +290,20 @@ class MusicActivity : AppCompatActivity() ,ServiceConnection{
 
     }
     fun nextSongPlay(view: android.view.View) {
-        if(songPosition==myMusicList.size - 1)
+        if(songPosition == myMusicList.size - 1)
         {
+            audioVisualization.release()
             songPosition = 0
+
             setLayout()
             mediaPlaying()
 
 
         }
         else{
+            audioVisualization.release()
             songPosition++
+
             setLayout()
             mediaPlaying()
 
@@ -348,7 +371,7 @@ class MusicActivity : AppCompatActivity() ,ServiceConnection{
 
 
         runnable = Runnable {
-            currentTime?.text = myMusicList[MusicActivity.songPosition].formatDuration(musicService?.mediaPlayer?.currentPosition!!.toLong())
+            currentTime?.text = myMusicList[songPosition].formatDuration(musicService?.mediaPlayer?.currentPosition!!.toLong())
             seekBar?.progress = musicService!!.mediaPlayer!!.currentPosition
             Handler(Looper.getMainLooper()).postDelayed(runnable!!,200)
 

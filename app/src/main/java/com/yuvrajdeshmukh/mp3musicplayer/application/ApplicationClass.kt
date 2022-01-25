@@ -1,4 +1,4 @@
-package com.yuvrajdeshmukh.mp3musicplayer
+package com.yuvrajdeshmukh.mp3musicplayer.application
 
 import android.app.Application
 import android.app.NotificationChannel

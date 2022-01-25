@@ -1,4 +1,4 @@
-package com.yuvrajdeshmukh.mp3musicplayer
+package com.yuvrajdeshmukh.mp3musicplayer.activity
 
 import android.Manifest
 import android.annotation.SuppressLint
@@ -14,6 +14,9 @@ import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
+import com.yuvrajdeshmukh.mp3musicplayer.data.Music
+import com.yuvrajdeshmukh.mp3musicplayer.R
+import com.yuvrajdeshmukh.mp3musicplayer.fragment.FavoritesFragment
 
 @SuppressLint("CustomSplashScreen")
 class SplashActivity : AppCompatActivity() {
